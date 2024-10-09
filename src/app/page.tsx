@@ -1,95 +1,67 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client"
+import { useFixFullScreenCursorStyle } from "@/hooks/use_fix_fullscreen_cursor"
+import { useFullScreen } from "@/hooks/use_fullscreen"
+import { useRef } from "react"
+import styles from "./page.module.css"
 
 export default function Home() {
+  const rootRef = useRef<HTMLDivElement>(null)
+  const toggleFullScreen = useFullScreen(rootRef)
+  useFixFullScreenCursorStyle(rootRef)
+  const tabBarHeight = window.outerHeight - window.innerHeight
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
+    <main
+      className={styles.main}
+      ref={rootRef}
+      style={{
+        cursor: "pointer",
+        display: "flex",
+        flexDirection: "column",
+        margin: 0,
+        justifyContent: "start",
+        padding: 0,
+      }}
+    >
+      {/* <div className={styles.description}>
+        <a href="http://10.231.49.203:3000/login?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVVUlEIjoiZDk5YjU4YTgtOTEzMy00MTA4LWIyYmMtNzc5YjNlOWNkY2JmIiwiSUQiOjQsIlVzZXJuYW1lIjoiMTc0NjQ0ODQxMkBxcS5jb20iLCJOaWNrTmFtZSI6IjExMiIsIkNvbXBhbnlVbmlxSUQiOjY0ODc0MCwiQXV0aG9yaXR5SWQiOjUsIkJ1ZmZlclRpbWUiOjg2NDAwLCJleHAiOjE3MjQzMTU2NzIsImlzcyI6InFtUGx1cyIsIm5iZiI6MTcyMzcwOTg3Mn0.jkIqdkr0JTo3xlEWg8vjclc31_eJApVZY--8wStsVmI&desktopID=i-gzrteztehazgky3g-bjun01&expiresAt=1724315672000&username=1746448412@qq.com&userid=4&deviceID=606485509&type=PCC">
+          点击跳转到云桌面
+        </a>
+      </div> */}
+      <div
+        style={{
+          width: "100vw",
+          height: "1px",
+          background: "white",
+          marginTop: tabBarHeight - 40,
+        }}
+      />
+      <div
+        style={{
+          width: "100vw",
+          height: "1px",
+          background: "white",
+          marginTop: 40,
+        }}
+      />
+      <div
+        className={styles.description}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "start",
+          marginTop: "20px",
+        }}
+      >
+        <p
+          onClick={() => {
+            toggleFullScreen()
+          }}
+        >
+          全屏
         </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
       </div>
     </main>
-  );
+  )
 }
