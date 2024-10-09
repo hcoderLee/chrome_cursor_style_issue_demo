@@ -1,14 +1,18 @@
 "use client"
 import { useFixFullScreenCursorStyle } from "@/hooks/use_fix_fullscreen_cursor"
 import { useFullScreen } from "@/hooks/use_fullscreen"
-import { useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import styles from "./page.module.css"
 
 export default function Home() {
   const rootRef = useRef<HTMLDivElement>(null)
+  const [tabBarHeight, setTabBarHeight] = useState(0)
   const toggleFullScreen = useFullScreen(rootRef)
-  useFixFullScreenCursorStyle(rootRef)
-  const tabBarHeight = window.outerHeight - window.innerHeight
+  // I write a hook to fix this cursor style issue temporarily. You can see the cursor style issue more clearly in the hook file.
+  // useFixFullScreenCursorStyle(rootRef)
+  useEffect(() => {
+    setTabBarHeight(window.outerHeight - window.innerHeight)
+  }, [])
 
   return (
     <main
@@ -23,11 +27,7 @@ export default function Home() {
         padding: 0,
       }}
     >
-      {/* <div className={styles.description}>
-        <a href="http://10.231.49.203:3000/login?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVVUlEIjoiZDk5YjU4YTgtOTEzMy00MTA4LWIyYmMtNzc5YjNlOWNkY2JmIiwiSUQiOjQsIlVzZXJuYW1lIjoiMTc0NjQ0ODQxMkBxcS5jb20iLCJOaWNrTmFtZSI6IjExMiIsIkNvbXBhbnlVbmlxSUQiOjY0ODc0MCwiQXV0aG9yaXR5SWQiOjUsIkJ1ZmZlclRpbWUiOjg2NDAwLCJleHAiOjE3MjQzMTU2NzIsImlzcyI6InFtUGx1cyIsIm5iZiI6MTcyMzcwOTg3Mn0.jkIqdkr0JTo3xlEWg8vjclc31_eJApVZY--8wStsVmI&desktopID=i-gzrteztehazgky3g-bjun01&expiresAt=1724315672000&username=1746448412@qq.com&userid=4&deviceID=606485509&type=PCC">
-          点击跳转到云桌面
-        </a>
-      </div> */}
+      {/* When the mouse moves down from the top edge and below this line, the app status bar starts to disappear */}
       <div
         style={{
           width: "100vw",
@@ -36,6 +36,7 @@ export default function Home() {
           marginTop: tabBarHeight - 40,
         }}
       />
+      {/* When the mouse moves down below this line, the cursor will revert to the default arrow */}
       <div
         style={{
           width: "100vw",
@@ -59,7 +60,7 @@ export default function Home() {
             toggleFullScreen()
           }}
         >
-          全屏
+          FullScreen
         </p>
       </div>
     </main>

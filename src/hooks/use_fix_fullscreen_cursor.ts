@@ -4,8 +4,11 @@ export function useFixFullScreenCursorStyle(
   viewRef: React.RefObject<HTMLElement>
 ) {
   const hasFullScreenElement = () => {
-    const fullScreenElement = document.fullscreenElement
-    return fullScreenElement !== null && fullScreenElement !== undefined
+    if (typeof document !== "undefined") {
+      const fullScreenElement = document.fullscreenElement
+      return fullScreenElement !== null && fullScreenElement !== undefined
+    }
+    return false
   }
   const isFullScreen = useRef(hasFullScreenElement())
 
@@ -13,10 +16,14 @@ export function useFixFullScreenCursorStyle(
     const handleFullScreenChange = () => {
       isFullScreen.current = hasFullScreenElement()
     }
-    document.addEventListener("fullscreenchange", handleFullScreenChange)
+    if (typeof document !== "undefined") {
+      document.addEventListener("fullscreenchange", handleFullScreenChange)
+    }
 
     const onDispose = () => {
-      document.removeEventListener("fullscreenchange", handleFullScreenChange)
+      if (typeof document !== "undefined") {
+        document.removeEventListener("fullscreenchange", handleFullScreenChange)
+      }
     }
     return onDispose
   }, [])
@@ -29,28 +36,35 @@ export function useFixFullScreenCursorStyle(
     let recoverTimer: number | null = null
 
     const recoverCursor = (delay: number, callback?: () => void) => {
+      // Change the cursor style to the default first, as the current cursor style is already set to pointer. Setting it to pointer directly will have no effect
       if (viewRef.current) {
-        console.log("Test*** set cursor to default")
         viewRef.current.style.cursor = "default"
       }
       if (recoverTimer !== null) {
         window.clearTimeout(recoverTimer)
       }
+      // Delay setting the cursor style to pointer, because set it to pointer immediately will have no effect
       recoverTimer = window.setTimeout(() => {
         if (viewRef.current) {
-          console.log("Test*** set cursor to pointer")
           viewRef.current.style.cursor = "pointer"
         }
         recoverTimer = null
         callback?.()
       }, delay)
     }
+
     const onMouseMove = (e: MouseEvent) => {
       if (!isFullScreen.current) {
         return
       }
 
       if (isMoveFromTop) {
+        // The mouse moves from the top edge and below the first line, where the app status
+        // bar starts to disappear, the cursor style be revert to the default arrow in the 
+        // meantime. 
+        // Delay setting the cursor style to pointer by 200ms,  because if set too 
+        // early, the cursor style will revert back to the default arrow after the app status 
+        // bar disappearance animation finishes.
         if (e.clientY >= tabBarHeight - 40) {
           console.log("Test*** move from top")
           isHandlingMoveFromTop = true
@@ -67,6 +81,8 @@ export function useFixFullScreenCursorStyle(
         return
       }
       if (e.clientY > tabBarHeight) {
+        // The mouse moves over the second line, and the cursor style be revert to the
+        // default arrow. And delay setting the cursor style back to pointer
         if (hasAboveTabBar && !isHandlingMoveFromTop) {
           console.log("Test*** move over tab bar")
           recoverCursor(50)
@@ -79,7 +95,9 @@ export function useFixFullScreenCursorStyle(
       if (!isFullScreen.current) {
         return
       }
-      console.log("Test*** onMouseEnter, clientY: ", e.clientY)
+      // When move down from top edge and this callback is called, the cursor style is change 
+      // from default arrow to pointer 
+      console.log("Test*** onMouseEnter")
       isMoveFromTop = true
     }
     viewRef.current?.addEventListener("mousemove", onMouseMove)
